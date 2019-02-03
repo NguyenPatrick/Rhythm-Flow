@@ -9,6 +9,9 @@ public class Player : MonoBehaviour {
     private const float hitboxFactor = 4.5f;
     private const float spawnFactor = 17.5f;
     private const int winScore = 1000;
+    private const float speedLimit = 22.5f;
+    private const float spawnTimeLimit = 0.35f;
+
 
 
     public float spawnTime = 1f; 
@@ -117,11 +120,11 @@ public class Player : MonoBehaviour {
             score = score + 500 + (((combo/0.25f)/2f) * (-speed/0.25f)) + ((-speed) / 0.25f);
             combo = combo + 1;
 
-            if (speed > -20f){
+            if (speed > -spawnTimeLimit) {
                 speed = speed - 0.25f;
             }
 
-            if(spawnTime > 0.35f){
+            if(spawnTime > spawnTimeLimit) {
                 spawnTime = spawnTime - 0.025f;
             }
 

@@ -93,6 +93,7 @@ public class Game : MonoBehaviour {
         comboTextP2.text = "Combo: " + newP2.combo;
         timeText.text = "Time Left: " + gameTime;
 
+
         if(isPaused == false){
             newP1.detectChange();
             newP2.detectChange();
