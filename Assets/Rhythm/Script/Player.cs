@@ -23,7 +23,6 @@ public class Player : MonoBehaviour {
         Two
     }
 
-
     public HitBox innerLeftHitBox;
     public HitBox innerCenterHitBox;
     public HitBox innerRightHitBox;
@@ -133,7 +132,6 @@ public class Player : MonoBehaviour {
             Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
             ringObject.createYellowRing();
             score = score + 250 + ((5 * (-speed -5)) / 0.25f);
-            combo = 0;
         }
         else
         {
