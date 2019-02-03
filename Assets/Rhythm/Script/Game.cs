@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class Game : MonoBehaviour {
@@ -18,9 +19,13 @@ public class Game : MonoBehaviour {
     public static bool gameOver = false;
     private int gameTime = 60;
 
+    public GameObject pauseButton;
     public GameObject pauseMenu;
     public GameObject gameOverMenu;
-    public GameObject pauseButton;
+    public GameObject timeMenu;
+    public GameObject player1ScoreMenu;
+    public GameObject player2ScoreMenu;
+
 
     public static Player newP1;
     public static Player newP2;
@@ -30,6 +35,7 @@ public class Game : MonoBehaviour {
     public Text scoreTextP2;
     public Text comboTextP2;
     public Text timeText;
+    public Text winnerText;
 
 
     public static GameObject createGameComponent(float x, float y, GameObject prefab)
@@ -87,12 +93,14 @@ public class Game : MonoBehaviour {
         comboTextP2.text = "Combo: " + newP2.combo;
         timeText.text = "Time Left: " + gameTime;
 
-        newP1.detectChange();
-        newP2.detectChange();    
+        if(isPaused == false){
+            newP1.detectChange();
+            newP2.detectChange();
+        }
     }
 
 
-    public IEnumerator countDown()
+    private IEnumerator countDown()
     {
         yield return new WaitForSeconds(1f);
 
@@ -109,8 +117,10 @@ public class Game : MonoBehaviour {
     }
 
 
-    public void pauseGame()
+    public void PauseGame()
     {
+
+        Debug.Log("Paused");
         isPaused = true;
         pauseMenu.SetActive(true);
         pauseButton.SetActive(false);
@@ -124,7 +134,7 @@ public class Game : MonoBehaviour {
         }
     }
 
-    public void resumeGame(){
+    public void ResumeGame(){
 
         isPaused = false;
         pauseMenu.SetActive(false);
@@ -147,10 +157,46 @@ public class Game : MonoBehaviour {
             }
         }
     }
+    public void Restart() {
+        Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);
+    }
 
-    public void endGame()
-    {
+    private void endGame()
+    { 
         isPaused = true;
         gameOver = true;
+
+        gameOverMenu.SetActive(true);
+        pauseButton.SetActive(false);
+        pauseMenu.SetActive(false);
+        timeMenu.SetActive(false);
+        player1ScoreMenu.SetActive(false);
+        player2ScoreMenu.SetActive(false);
+
+        string winner = "";
+        if(newP1.score > newP2.score){
+            winner = "Player 1!";
+        }
+        else if (newP2.score > newP1.score){
+            winner = "Player 2!";
+        }
+
+        if(winner != ""){
+            winnerText.text = "The Winner is " + winner + "\n\n Player 1 Score: " +
+            newP1.score + "\n Player 2 Score: " + newP2.score;
+        }
+        else {
+            winnerText.text = "The Outcome is a Tie! \n\n Player 1 Score: " +
+            newP1.score + "\n Player 2 Score: " + newP2.score;
+        }
+            
+        foreach (GameObject obj in GameObject.FindObjectsOfType(typeof(GameObject)))
+        {
+            if (obj.name == Note.noteName || obj.name == HitBox.innerHitBoxName 
+                || obj.name == HitBox.outerHitBoxName || obj.name == HitBox.boundaryName)
+            {
+                Destroy(obj);
+            }
+        }
     }
 }

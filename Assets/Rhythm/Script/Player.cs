@@ -11,7 +11,7 @@ public class Player : MonoBehaviour {
     private const int winScore = 1000;
 
 
-    public float spawnTime = 0.75f; 
+    public float spawnTime = 1f; 
     public float speed = -5f;
     public float combo;
     public float score;
@@ -123,7 +123,7 @@ public class Player : MonoBehaviour {
             }
 
             if(spawnTime > 0.35f){
-                spawnTime = spawnTime - 0.0125f;
+                spawnTime = spawnTime - 0.025f;
             }
 
         }

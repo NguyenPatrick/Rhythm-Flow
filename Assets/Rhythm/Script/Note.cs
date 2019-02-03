@@ -39,12 +39,10 @@ public class Note : MonoBehaviour
             Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
             ringObject.createRedRing();
 
-            if(position.x < 0) 
-            {
+            if(position.x < 0) {
                 Game.newP1.combo = 0;
             }
-            else 
-            {
+            else {
                 Game.newP2.combo = 0;
             }
 
