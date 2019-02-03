@@ -26,6 +26,30 @@ public class Note : MonoBehaviour
     // used to determine if a note is fully in the inner hitZone
     void OnTriggerEnter2D(Collider2D col)
     {
+
+        // when the boundary is hit, the note is destroyed and a red error ring is generated
+        if (col.gameObject.name == HitBox.boundaryName)
+        {
+            Destroy(this.gameObject);
+
+            isFullyInHitZone = false;
+            isPartiallyInHitZone = false;
+
+            Vector2 position = innerHitBox.GetComponent<Transform>().position;
+            Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
+            ringObject.createRedRing();
+
+            if(position.x < 0) 
+            {
+                Game.newP1.combo = 0;
+            }
+            else 
+            {
+                Game.newP2.combo = 0;
+            }
+
+        }
+
         if (col.gameObject.name == HitBox.innerHitBoxName)
         {
             innerHitBox = col.gameObject;
@@ -35,20 +59,8 @@ public class Note : MonoBehaviour
         {
             isPartiallyInHitZone = true;
         }
-
-        // when the boundary is hit, the note is destroyed and a red error ring is generated
-        if (col.gameObject.name == HitBox.boundaryName)
-        {
-            isFullyInHitZone = false;
-            isPartiallyInHitZone = false;
-            Destroy(this.gameObject);
-
-//            Game.validCombo = false;
-//            Game.missedNotes = Game.missedNotes + 1;
-
-            Vector2 position = innerHitBox.GetComponent<Transform>().position;
-            Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
-            ringObject.createRedRing();
-        }
     }
+
+
+
 }

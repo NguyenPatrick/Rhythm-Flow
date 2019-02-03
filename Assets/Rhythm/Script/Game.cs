@@ -12,139 +12,27 @@ public class Game : MonoBehaviour {
     public GameObject outerHitBoxPrefab;
     public GameObject notePrefab;
     public GameObject ringPrefab;
+    public GameObject deletePrefab;
 
-    private const float hitboxFactor = 4.5f;
-    private const float spawnFactor = 17.5f;
-    private const int maxNumberOfNotes = 5;
-    private const float waitTime = 1.5f; // cooldown for notes
-
-    private int totalNotes;
-    private float speed = -3f;
-
-
+    public static bool isPaused = false;
+    public static bool gameOver = false;
     private int gameTime = 60;
-    private bool isPaused = false;
-    private bool gameOver = false;
-
 
     public GameObject pauseMenu;
     public GameObject gameOverMenu;
     public GameObject pauseButton;
 
-    private Player newP1;
-    private Player newP2;
+    public static Player newP1;
+    public static Player newP2;
+
+    public Text scoreTextP1;
+    public Text comboTextP1;
+    public Text scoreTextP2;
+    public Text comboTextP2;
+    public Text timeText;
 
 
-    private class Player{
-
-        public enum PlayerNumber
-        {
-            One,
-            Two
-        }
-
-        public Vector2[] spawnPositions;
-        public HitBox innerLeftHitBox;
-        public HitBox innerCenterHitBox;
-        public HitBox innerRightHitBox;
-        public HitBox outerLeftHitBox;
-        public HitBox outerCenterHitBox;
-        public HitBox outerRightHitBox;
-
-        private PlayerNumber playerNum;
-        private GameObject ringPrefab;
-
-        // create all the hit boxes and spawn positions for the player
-        public Player(PlayerNumber playerNum, GameObject innerHitBoxPrefab, GameObject outerHitBoxPrefab, GameObject ringPrefab){
-
-            this.playerNum = playerNum;
-            this.ringPrefab = ringPrefab;
-
-            Vector2 hitBoxSpawnCoordinate;
-            spawnPositions = new Vector2[3];
-
-            if (this.playerNum == PlayerNumber.One){
-                hitBoxSpawnCoordinate = new Vector2(-7.75f, -9.5f);
-                spawnPositions[0] = new Vector2(hitBoxSpawnCoordinate.x - hitboxFactor, hitBoxSpawnCoordinate.y + spawnFactor);
-                spawnPositions[1] = new Vector2(hitBoxSpawnCoordinate.x, hitBoxSpawnCoordinate.y + spawnFactor);
-                spawnPositions[2] = new Vector2(hitBoxSpawnCoordinate.x + hitboxFactor, hitBoxSpawnCoordinate.y + spawnFactor);
-            }
-            else
-            {
-                hitBoxSpawnCoordinate = new Vector2(7.75f, -9.5f);
-                spawnPositions[0] = new Vector2(hitBoxSpawnCoordinate.x - hitboxFactor, hitBoxSpawnCoordinate.y + spawnFactor);
-                spawnPositions[1] = new Vector2(hitBoxSpawnCoordinate.x, hitBoxSpawnCoordinate.y + spawnFactor);
-                spawnPositions[2] = new Vector2(hitBoxSpawnCoordinate.x + hitboxFactor, hitBoxSpawnCoordinate.y + spawnFactor);
-            }
-
-            innerLeftHitBox = createGameComponent(hitBoxSpawnCoordinate.x - hitboxFactor, hitBoxSpawnCoordinate.y, innerHitBoxPrefab).GetComponent<HitBox>();
-            innerCenterHitBox = createGameComponent(hitBoxSpawnCoordinate.x, hitBoxSpawnCoordinate.y, innerHitBoxPrefab).GetComponent<HitBox>();
-            innerRightHitBox = createGameComponent(hitBoxSpawnCoordinate.x + hitboxFactor, hitBoxSpawnCoordinate.y, innerHitBoxPrefab).GetComponent<HitBox>();
-
-            outerLeftHitBox = createGameComponent(hitBoxSpawnCoordinate.x - hitboxFactor, hitBoxSpawnCoordinate.y, outerHitBoxPrefab).GetComponent<HitBox>();
-            outerCenterHitBox = createGameComponent(hitBoxSpawnCoordinate.x, hitBoxSpawnCoordinate.y, outerHitBoxPrefab).GetComponent<HitBox>();
-            outerRightHitBox = createGameComponent(hitBoxSpawnCoordinate.x + hitboxFactor, hitBoxSpawnCoordinate.y, outerHitBoxPrefab).GetComponent<HitBox>();
-        }
-
-        public void detectChange(){
-
-            if (this.playerNum == PlayerNumber.One) {
-
-                if (Input.GetKeyDown(KeyCode.A))
-                {
-                    controlGameComponent(innerLeftHitBox, outerLeftHitBox);
-                }
-                else if (Input.GetKeyDown(KeyCode.S))
-                {
-                    controlGameComponent(innerCenterHitBox, outerCenterHitBox);
-                }
-                else if (Input.GetKeyUp(KeyCode.D))
-                {
-                    controlGameComponent(innerRightHitBox, outerRightHitBox);
-                }
-            }
-            else if (this.playerNum == PlayerNumber.Two){
-
-                if (Input.GetKeyDown(KeyCode.J))
-                {
-                    controlGameComponent(innerLeftHitBox, outerLeftHitBox);
-                }
-                else if (Input.GetKeyDown(KeyCode.K))
-                {
-                    controlGameComponent(innerCenterHitBox, outerCenterHitBox);
-                }
-                else if (Input.GetKeyUp(KeyCode.L))
-                {
-                    controlGameComponent(innerRightHitBox, outerRightHitBox);
-                }
-            }
-        }
-
-        private void controlGameComponent(HitBox innerHitBox, HitBox outerHitBox)
-        {
-            Vector2 position = innerHitBox.GetComponent<Transform>().position;
-
-            if (innerHitBox.getNoteIsTouching() && !outerHitBox.getNoteIsTouching())
-            {
-                Destroy(innerHitBox.getNoteObject());
-                Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
-                ringObject.createGreenRing();
-            }
-            else if (innerHitBox.getNoteIsTouching() && outerHitBox.getNoteIsTouching())
-            {
-                Destroy(innerHitBox.getNoteObject());
-                Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
-                ringObject.createYellowRing();
-            }
-            else
-            {
-                Ring ringObject = ((GameObject)Instantiate(ringPrefab, position, ringPrefab.transform.rotation)).GetComponent<Ring>();
-                ringObject.createRedRing();
-            }
-        }
-    }
-
-    private static GameObject createGameComponent(float x, float y, GameObject prefab)
+    public static GameObject createGameComponent(float x, float y, GameObject prefab)
     {
         Vector2 newPosition = new Vector2(x, y);
         GameObject newPrefab = (GameObject)Instantiate(prefab, newPosition, prefab.transform.rotation);
@@ -152,29 +40,57 @@ public class Game : MonoBehaviour {
     }
 
 
+    private void createNote(Player player)
+    {
+        int hitBoxCoordinatePosition = Random.Range(0, player.spawnPositions.Length);
+        Vector2 tempSpawnCoordinate = player.spawnPositions[hitBoxCoordinatePosition];
+        Vector2 newNotePosition = new Vector2(tempSpawnCoordinate.x, tempSpawnCoordinate.y); // based on a random spawn point
+        GameObject newNoteObject = (GameObject)Instantiate(notePrefab, newNotePosition, notePrefab.transform.rotation);
+
+        newNoteObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, player.speed);
+    }
+
+
+    public IEnumerator noteTimer(Player player)
+    {
+        if (Game.isPaused == false)
+        {
+            createNote(player);
+        }
+
+        yield return new WaitForSeconds(player.spawnTime);
+
+        StartCoroutine(noteTimer(player));
+    }
+
     void Start () {
 
-        newP1 = new Player(Player.PlayerNumber.One, innerHitBoxPrefab, outerHitBoxPrefab, ringPrefab);
-        newP2 = new Player(Player.PlayerNumber.Two, innerHitBoxPrefab, outerHitBoxPrefab, ringPrefab);
 
+        newP1 = new Player(Player.PlayerNumber.One, notePrefab, innerHitBoxPrefab, outerHitBoxPrefab, ringPrefab);
+        newP2 = new Player(Player.PlayerNumber.Two, notePrefab, innerHitBoxPrefab, outerHitBoxPrefab, ringPrefab);
+        createGameComponent(0, -12.75f, deletePrefab);
+
+        StartCoroutine(noteTimer(newP1));
+        StartCoroutine(noteTimer(newP2));
         StartCoroutine(countDown());
-        StartCoroutine(noteTimer());
 
         isPaused = false;
         gameOver = false;
     }
 
-    public IEnumerator noteTimer()
+
+    void Update()
     {
-        if (isPaused == false && totalNotes < maxNumberOfNotes)
-        {
-            createNote();
-        }
+        scoreTextP1.text = "Score: " + newP1.score;
+        comboTextP1.text = "Combo: " + newP1.combo;
+        scoreTextP2.text = "Score: " + newP2.score;
+        comboTextP2.text = "Combo: " + newP2.combo;
+        timeText.text = "Time Left: " + gameTime;
 
-        yield return new WaitForSeconds(waitTime);
-
-        StartCoroutine(noteTimer());
+        newP1.detectChange();
+        newP2.detectChange();    
     }
+
 
     public IEnumerator countDown()
     {
@@ -184,31 +100,12 @@ public class Game : MonoBehaviour {
         {
             gameTime = gameTime - 1;
         }
-        else if(gameTime == 0)
+        else if (gameTime == 0)
         {
             endGame();
         }
 
         StartCoroutine(countDown());
-    }
-
-
-    void Update()
-    {
-        newP1.detectChange();
-        newP2.detectChange();    
-    }
-
-    private void createNote()
-    {
-        int hitBoxCoordinatePosition = Random.Range(0, newP1.spawnPositions.Length - 2);
-        Vector2 tempSpawnCoordinate = newP1.spawnPositions[hitBoxCoordinatePosition];
-
-        Vector2 newNotePosition = new Vector2(tempSpawnCoordinate.x, tempSpawnCoordinate.y); // based on a random spawn point
-        GameObject newNoteObject = (GameObject)Instantiate(notePrefab, newNotePosition, notePrefab.transform.rotation);
-
-        newNoteObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, speed);
-        totalNotes = totalNotes + 1;
     }
 
 
@@ -237,7 +134,16 @@ public class Game : MonoBehaviour {
         {
             if (note.name == Note.noteName)
             {
-                note.GetComponent<Note>().GetComponent<Rigidbody2D>().velocity = new Vector2(0, speed);
+                Vector2 position = note.GetComponent<Transform>().position;
+
+                if (position.x < 0)
+                {
+                    note.GetComponent<Note>().GetComponent<Rigidbody2D>().velocity = new Vector2(0, newP1.speed);
+                }
+                else
+                {
+                    note.GetComponent<Note>().GetComponent<Rigidbody2D>().velocity = new Vector2(0, newP2.speed);
+                }
             }
         }
     }
