@@ -20,7 +20,7 @@ Key "L": Triggers the right hitbox
 
 The goal of the game is to score higher than your opponent. Points are scored when a player triggers a hitbox when a note is in contact with it.
 
-**Points Chart for Hitbox Triggers: **
+**Points Chart for Hitbox Triggers:**
 Green: Perfect hit! The hitbox was triggered when a note was in full contact, **full points + combo bonus**
 Yellow: Hitbox was triggered when a note was in partial contact, **partial points**
 Red: Hitbox was triggered when a note was not in contact, **no points**
