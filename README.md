@@ -1,5 +1,11 @@
+# Mchacks 2019
+Won the best interactive multi user application at McHacks 2019 along with a Nintendo Switch prize
+https://devpost.com/software/rhythm-flow
+
 # Objective
 The objective of the game is to score higher than your opponent. Points are scored if a player triggers a hitbox when a note is in contact with it.
+
+![Picture 1](Pictures/Rhythm.png)
 
 **Points Chart:** <br/>
 **Green:** Perfect hit! The hitbox was triggered when a note was in full contact, **full points + combo bonus** <br/>
